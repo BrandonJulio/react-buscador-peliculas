@@ -1,16 +1,31 @@
-import responseMovies from '../mocks/with-result.json'
-import withoutResults from '../mocks/no-result.json'
+import { useState } from 'react'
+import { searchMovies } from '../services/movies.js'
+import { useRef } from 'react'
+export function useMovies({ search }) {
+    const [movies, setMovies] = useState([])
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState(null)
+    const previosSearch = useRef(search)
 
-export function useMovies(){
-    const movies = responseMovies.Search
-    // Este condigo es el que decide como se hace la transformación de estos datos que viene de la API
-    const mappedMovies = movies?.map(movie =>{
-        return {
-            id: movie.imdbID,
-            title: movie.Title,
-            year:movie.Year,
-            poster: movie.Poster
+
+    const getMovies = async () => {
+        if(search === previosSearch.current) return
+        try {
+            setLoading(true)
+            setError(null)
+            previosSearch.current = search
+            const newMovies = await searchMovies({ search })
+            setMovies(newMovies)
         }
-    })
-    return {movies:mappedMovies}
+        catch(e) {
+            setError(e.message)
+        }finally{
+            //Tanto como en el try como en el cath
+            setLoading(false)
+        }
+        
+    }
+    return { movies, getMovies, loading }
 }
+    
+//Esto es una caja negra que podemos iterar en ella

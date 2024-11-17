@@ -36,14 +36,14 @@ function useSearch (){
 
 function App() {
   // Este es una caja negra est custom hooks
-  const {movies}=useMovies()
   const [search, updateSearch, error] = useSearch()
+  const {movies,loading, getMovies}=useMovies({search})
  
 
  
   const handleSubmit = (event) => {
     event.preventDefault()
-    console.log({search})
+   getMovies()
   }
 
   const handleChange = (event) => {
@@ -66,7 +66,9 @@ function App() {
     </header>
 
     <main>
-     <Movies movies={movies}/>
+      {
+        loading ? <p>Cargando.....</p>: <Movies movies={movies}/>
+      } 
     </main>
     </div>
   )
